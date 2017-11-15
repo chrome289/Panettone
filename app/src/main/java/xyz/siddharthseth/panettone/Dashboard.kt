@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -48,6 +49,8 @@ class Dashboard : Fragment() {
             val options = BitmapFactory.Options()
             options.inJustDecodeBounds = true
             BitmapFactory.decodeStream(activity.contentResolver.openInputStream(data.data), null, options)
+            Log.v("nero", options.outHeight.toString() + " *** " + options.outWidth)
+
             mListener?.openImageResize(data.data.toString()
                     , activity.filesDir.toString() + "/1.jpg"
                     , options.outWidth
@@ -57,8 +60,8 @@ class Dashboard : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        if (context is OnFragmentInteractionListener) {
-            mListener = context
+        mListener = if (context is OnFragmentInteractionListener) {
+            context
         } else {
             throw RuntimeException(context.toString() + " must implement OnFragmentInteractionListener")
         }

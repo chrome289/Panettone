@@ -112,8 +112,8 @@ class CameraFragment : Fragment(), CameraKitEventListener {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        if (context is OnFragmentInteractionListener) {
-            mListener = context
+        mListener = if (context is OnFragmentInteractionListener) {
+            context
         } else {
             throw RuntimeException(context.toString() + " must implement OnFragmentInteractionListener")
         }

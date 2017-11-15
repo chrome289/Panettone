@@ -3,6 +3,7 @@ package xyz.siddharthseth.panettone
 import android.app.Fragment
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap.CompressFormat.PNG
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
@@ -11,9 +12,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.yalantis.ucrop.UCrop
-import kotlinx.android.synthetic.main.fragment_dashboard.*
 import java.io.File
-
 
 class ImageResize : Fragment() {
 
@@ -45,30 +44,38 @@ class ImageResize : Fragment() {
 
         Log.v("nero", "first " + temp.mkdirs())
         val finalFile = File(temp, "1.jpg")
+        if (finalFile.exists()) finalFile.delete()
         finalFile.createNewFile()
 
+        val options = UCrop.Options()
+        options.setCompressionFormat(PNG)
+
         outputUri = Uri.fromFile(finalFile)
-        UCrop.of(inputUri, outputUri)
-                .withMaxResultSize(1080, 768) // any resolution you want
+        UCrop.of(inputUri, outputUri).withOptions(options)
                 .start(context, this)
 
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+        Log.v("nero", "nero")
         if (resultCode != UCrop.RESULT_ERROR && requestCode == UCrop.REQUEST_CROP) {
             val resultUri = UCrop.getOutput(data)
-
-            imageView.setImageURI(resultUri)
+            if (resultUri != null) mListener?.openImageSave(resultUri)
+        } else if (resultCode != UCrop.RESULT_ERROR && requestCode != UCrop.REQUEST_CROP) {
+            val resultUri = UCrop.getOutput(data)
+            if (resultUri != null) mListener?.openImageSave(resultUri)
         } else if (resultCode == UCrop.RESULT_ERROR) {
             val cropError = UCrop.getError(data)
             Log.v("nero", "error for cropping " + cropError)
+        } else {
+            fragmentManager.popBackStack()
         }
     }
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        if (context is OnFragmentInteractionListener) {
-            mListener = context
+        mListener = if (context is OnFragmentInteractionListener) {
+            context
         } else {
             throw RuntimeException(context.toString() + " must implement OnFragmentInteractionListener")
         }
@@ -79,8 +86,9 @@ class ImageResize : Fragment() {
         mListener = null
     }
 
-
-    interface OnFragmentInteractionListener
+    interface OnFragmentInteractionListener {
+        fun openImageSave(croppedUri: Uri)
+    }
 
     companion object {
         fun newInstance(inputUri: String, outputUri: String, imageWidth: Int, imageHeight: Int): ImageResize {
