@@ -6,60 +6,26 @@ import android.content.Context
 import android.net.Uri
 import android.os.Bundle
 import android.os.Environment
+import android.support.v4.content.ContextCompat
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.wonderkiln.camerakit.*
 import com.yalantis.ucrop.UCrop
+import io.fotoapparat.Fotoapparat
+import io.fotoapparat.parameter.ScaleType
+import io.fotoapparat.parameter.selector.*
+import io.fotoapparat.parameter.update.UpdateRequest
 import kotlinx.android.synthetic.main.fragment_camera.*
-import java.io.BufferedOutputStream
 import java.io.File
-import java.io.FileOutputStream
 
-class CameraFragment : Fragment(), CameraKitEventListener {
+class CameraFragment : Fragment() {
 
     val TAG = "CameraFragment"
     private var flash = 0
     private var cameraFacing = 0
     private var mListener: OnFragmentInteractionListener? = null
-
-    override fun onVideo(p0: CameraKitVideo?) {
-        Log.v(TAG, "video event")
-    }
-
-    override fun onEvent(p0: CameraKitEvent?) {
-        Log.v(TAG, "generic event")
-    }
-
-    override fun onImage(p0: CameraKitImage?) {
-        Log.v(TAG, "image event")
-        if (p0 != null) {
-            val byteArray = p0.jpeg
-            Log.v(TAG, byteArray.size.toString())
-
-            val file = File(context.cacheDir, System.currentTimeMillis().toString() + ".jpg")
-            val file2 = File(
-                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-                    "Panettone/")
-            file2.mkdirs()
-
-            val file3 = File(file2, System.currentTimeMillis().toString() + ".jpg")
-            val bufferedOutputStream = BufferedOutputStream(FileOutputStream(file))
-            bufferedOutputStream.write(byteArray)
-            bufferedOutputStream.flush()
-            bufferedOutputStream.close()
-            file.copyTo(file3, true, DEFAULT_BUFFER_SIZE)
-
-            UCrop.of(Uri.fromFile(file), Uri.fromFile(file3)).start(activity, 3)
-        }
-    }
-
-    override fun onError(p0: CameraKitError?) {
-        Log.v(TAG, "error event")
-        if (p0 != null) Log.v(TAG, p0.message)
-    }
-
+    var fotoApparat: Fotoapparat? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -69,11 +35,36 @@ class CameraFragment : Fragment(), CameraKitEventListener {
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        cameraView.bindCameraKitListener(this)
-        cameraView.addCameraKitListener(this)
+        fotoApparat = Fotoapparat.with(context).into(cameraView).previewScaleType(
+                ScaleType.CENTER_CROP).photoSize(SizeSelectors.biggestSize()).lensPosition(
+                LensPositionSelectors.back()).focusMode(
+                Selectors.firstAvailable(FocusModeSelectors.continuousFocus(),
+                        FocusModeSelectors.autoFocus(), FocusModeSelectors.fixed())).flash(
+                Selectors.firstAvailable(FlashSelectors.autoFlash(), FlashSelectors.off(),
+                        FlashSelectors.on())).build()
+
 
         shutter.setOnClickListener {
-            cameraView.captureImage()
+            if (fotoApparat != null) {
+                val result = fotoApparat!!.takePicture()
+
+                val parentDir = File(Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_PICTURES), "Panettone/")
+                parentDir.mkdirs()
+                val cacheFile = File(context.cacheDir,
+                        System.currentTimeMillis().toString() + "-bat")
+                val finalFile = File(parentDir, System.currentTimeMillis().toString() + ".jpg")
+                finalFile.createNewFile()
+
+                val pendingResult = result.saveToFile(cacheFile)
+                pendingResult.whenAvailable {
+                    Log.d(TAG, "image saved in cache")
+                    val inputImage = Image.newInstance(context, Uri.fromFile(cacheFile))
+                    val outputImage = Image.newInstance(context, Uri.fromFile(finalFile))
+
+                    openUCrop(inputImage, outputImage)
+                }
+            }
         }
 
         flashToggle.setOnClickListener {
@@ -82,25 +73,29 @@ class CameraFragment : Fragment(), CameraKitEventListener {
                     flashToggle.setImageResource(R.drawable.ic_flash_off)
                     flashToggle.tag = "1"
                     flash = 1
-                    cameraView.flash = CameraKit.Constants.FLASH_OFF
+                    fotoApparat?.updateParameters(
+                            UpdateRequest.builder().flash(FlashSelectors.off()).build())
                 }
                 1 -> {
                     flashToggle.setImageResource(R.drawable.ic_flash_on)
                     flashToggle.tag = "2"
                     flash = 2
-                    cameraView.flash = CameraKit.Constants.FLASH_ON
+                    fotoApparat?.updateParameters(
+                            UpdateRequest.builder().flash(FlashSelectors.on()).build())
                 }
                 2 -> {
                     flashToggle.setImageResource(R.drawable.ic_highlight)
                     flashToggle.tag = "3"
                     flash = 3
-                    cameraView.flash = CameraKit.Constants.FLASH_TORCH
+                    fotoApparat?.updateParameters(
+                            UpdateRequest.builder().flash(FlashSelectors.torch()).build())
                 }
                 3 -> {
                     flashToggle.setImageResource(R.drawable.ic_flash_auto)
                     flashToggle.tag = "0"
                     flash = 0
-                    cameraView.flash = CameraKit.Constants.FLASH_AUTO
+                    fotoApparat?.updateParameters(
+                            UpdateRequest.builder().flash(FlashSelectors.autoFlash()).build())
                 }
             }
         }
@@ -110,24 +105,56 @@ class CameraFragment : Fragment(), CameraKitEventListener {
                 cameraFacingToggle.setImageResource(R.drawable.ic_camera_front)
                 cameraFacingToggle.tag = "1"
                 cameraFacing = 1
-                cameraView.facing = CameraKit.Constants.FACING_FRONT
+                fotoApparat?.stop()
+                fotoApparat = Fotoapparat.with(context).into(cameraView).previewScaleType(
+                        ScaleType.CENTER_CROP).photoSize(SizeSelectors.biggestSize()).lensPosition(
+                        LensPositionSelectors.front()).focusMode(
+                        Selectors.firstAvailable(FocusModeSelectors.continuousFocus(),
+                                FocusModeSelectors.autoFocus(), FocusModeSelectors.fixed())).flash(
+                        Selectors.firstAvailable(FlashSelectors.autoFlash(), FlashSelectors.off(),
+                                FlashSelectors.on())).build()
+                fotoApparat?.start()
             } else {
                 cameraFacingToggle.setImageResource(R.drawable.ic_camera_rear)
                 cameraFacingToggle.tag = "0"
                 cameraFacing = 0
-                cameraView.facing = CameraKit.Constants.FACING_BACK
+                fotoApparat?.stop()
+                fotoApparat = Fotoapparat.with(context).into(cameraView).previewScaleType(
+                        ScaleType.CENTER_CROP).photoSize(SizeSelectors.biggestSize()).lensPosition(
+                        LensPositionSelectors.back()).focusMode(
+                        Selectors.firstAvailable(FocusModeSelectors.continuousFocus(),
+                                FocusModeSelectors.autoFocus(), FocusModeSelectors.fixed())).flash(
+                        Selectors.firstAvailable(FlashSelectors.autoFlash(), FlashSelectors.off(),
+                                FlashSelectors.on())).build()
+                fotoApparat?.start()
             }
+        }
+    }
+
+    private fun openUCrop(inputImage: Image, outputImage: Image) {
+        Log.v(TAG, "openUCrop")
+
+        val options = UCrop.Options()
+        options.setToolbarColor(ContextCompat.getColor(context, R.color.colorPrimary))
+        options.setStatusBarColor(ContextCompat.getColor(context, R.color.colorPrimaryDark))
+        options.setLogoColor(ContextCompat.getColor(context, R.color.colorPrimary))
+        options.setActiveWidgetColor(ContextCompat.getColor(context, R.color.colorPrimary))
+
+        try {
+            UCrop.of(inputImage.uri, outputImage.uri).withOptions(options).start(activity, 3)
+        } catch (exception: Exception) {
+            exception.printStackTrace()
         }
     }
 
     override fun onResume() {
         super.onResume()
-        cameraView.start()
+        fotoApparat?.start()
     }
 
     override fun onStop() {
         super.onStop()
-        cameraView.stop()
+        fotoApparat?.stop()
     }
 
     override fun onAttach(context: Context) {

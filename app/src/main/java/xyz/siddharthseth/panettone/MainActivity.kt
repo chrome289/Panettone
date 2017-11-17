@@ -66,6 +66,13 @@ class MainActivity : AppCompatActivity()
                 } else {
                     fragmentManager.popBackStack()
                 }
+            } else if (requestCode == 3) {
+                val resultUri: Uri? = UCrop.getOutput(data)
+                if (resultUri != null) {
+                    Log.d(TAG, resultUri.path + " --- path")
+                    val image = Image.newInstance(this, resultUri)
+                    openImageShare(image)
+                }
             }
         } else {
             Log.e(TAG, "onActivityResult null for requestcode " + resultCode)

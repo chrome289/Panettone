@@ -4,6 +4,7 @@ import android.app.Fragment
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +17,8 @@ class ImageShare : Fragment(), View.OnClickListener {
 
     private var mListener: OnFragmentInteractionListener? = null
 
+    val TAG = "ImageShare"
+
     override fun onClick(p0: View?) {
         fragmentManager.popBackStack()
     }
@@ -23,11 +26,15 @@ class ImageShare : Fragment(), View.OnClickListener {
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
+        Log.d(TAG, "onCreateView")
+
         return inflater.inflate(R.layout.fragment_image_share, container, false)
     }
 
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        Log.d(TAG, "onViewCreated")
 
         share.setOnClickListener {
             val shareIntent = Intent()
@@ -46,6 +53,8 @@ class ImageShare : Fragment(), View.OnClickListener {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        Log.d(TAG, "onAttach")
+
         mListener = if (context is OnFragmentInteractionListener) {
             context
         } else {
@@ -56,6 +65,8 @@ class ImageShare : Fragment(), View.OnClickListener {
 
     override fun onDetach() {
         super.onDetach()
+        Log.d(TAG, "onDetach")
+
         mListener = null
     }
 

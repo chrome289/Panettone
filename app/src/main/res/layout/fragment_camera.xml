@@ -5,20 +5,10 @@
     android:layout_height="match_parent"
     tools:context="xyz.siddharthseth.panettone.CameraFragment">
 
-    <com.wonderkiln.camerakit.CameraView xmlns:camerakit="http://schemas.android.com/apk/res-auto"
+    <io.fotoapparat.view.CameraView
         android:id="@+id/cameraView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:adjustViewBounds="true"
-        camerakit:ckCropOutput="false"
-        camerakit:ckFacing="back"
-        camerakit:ckFocus="tapWithMarker"
-        camerakit:ckJpegQuality="100"
-        camerakit:ckMethod="standard"
-        camerakit:ckVideoQuality="highest"
-        camerakit:ckZoom="pinch">
-
-    </com.wonderkiln.camerakit.CameraView>
+        android:layout_height="match_parent" />
 
     <RelativeLayout
         android:layout_width="match_parent"

@@ -2,6 +2,7 @@ package xyz.siddharthseth.panettone
 
 import android.content.ContentValues
 import android.content.Context
+import android.database.Cursor
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Environment
@@ -23,28 +24,32 @@ class Image {
 
         val TAG = "ImageClass"
 
+        //for mediastore files
         fun newInstance(context: Context, uri: Uri): Image {
             val image = Image()
 
             image.uri = uri
 
-            val cursor = context.contentResolver.query(uri, null, null, null, null)
-            val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-            val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
+            val cursor: Cursor? = context.contentResolver.query(uri, null, null, null, null)
+            if (cursor != null) {
+                val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
 
-            cursor.moveToFirst()
+                cursor.moveToFirst()
 
-            image.fileName = cursor.getString(nameIndex)
-            image.fileSize = cursor.getLong(sizeIndex)
+                image.fileName = cursor.getString(nameIndex)
+                image.fileSize = cursor.getLong(sizeIndex)
 
-            cursor.close()
+                cursor.close()
 
-            val options = BitmapFactory.Options()
-            options.inJustDecodeBounds = true
-            BitmapFactory.decodeStream(context.contentResolver.openInputStream(uri), null, options)
+                val options = BitmapFactory.Options()
+                options.inJustDecodeBounds = true
+                BitmapFactory.decodeStream(context.contentResolver.openInputStream(uri), null,
+                        options)
 
-            image.width = options.outWidth
-            image.height = options.outHeight
+                image.width = options.outWidth
+                image.height = options.outHeight
+            }
 
             Log.d(TAG, "image object created named " + image.fileName)
             Log.d(TAG, "the url is " + image.uri)
@@ -52,6 +57,7 @@ class Image {
             return image
         }
 
+        //for cache files
         fun newInstance(context: Context, fileName: String): Image {
             val image = Image()
 
