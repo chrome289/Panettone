@@ -2,15 +2,11 @@ package xyz.siddharthseth.panettone
 
 import android.app.Fragment
 import android.content.Context
-import android.content.Intent
-import android.graphics.BitmapFactory
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.fragment_dashboard.*
-
 
 class Dashboard : Fragment() {
 
@@ -18,10 +14,7 @@ class Dashboard : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        // Inflate the layout for this fragment
-
         return inflater.inflate(R.layout.fragment_dashboard, container, false)
-
     }
 
 
@@ -31,30 +24,11 @@ class Dashboard : Fragment() {
         fragmentManager.popBackStack()
 
         gallerySelector.setOnClickListener {
-            val intent = Intent()
-            intent.type = "image/*"
-            intent.action = Intent.ACTION_GET_CONTENT
-            startActivityForResult(intent, 1)
+            mListener?.openImageResize()
         }
 
         cameraSelector.setOnClickListener {
             mListener?.openCameraFragment()
-        }
-    }
-
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        super.onActivityResult(requestCode, resultCode, data)
-        if (requestCode == 1 && data != null) {
-
-            val options = BitmapFactory.Options()
-            options.inJustDecodeBounds = true
-            BitmapFactory.decodeStream(activity.contentResolver.openInputStream(data.data), null, options)
-            Log.v("nero", options.outHeight.toString() + " *** " + options.outWidth)
-
-            mListener?.openImageResize(data.data.toString()
-                    , activity.filesDir.toString() + "/1.jpg"
-                    , options.outWidth
-                    , options.outHeight)
         }
     }
 
@@ -75,7 +49,7 @@ class Dashboard : Fragment() {
 
     interface OnFragmentInteractionListener {
         fun openCameraFragment()
-        fun openImageResize(inputUri: String, outputUri: String, imageWidth: Int, imageHeight: Int)
+        fun openImageResize()
     }
 
     companion object {

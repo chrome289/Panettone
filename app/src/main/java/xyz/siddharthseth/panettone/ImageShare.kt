@@ -3,7 +3,6 @@ package xyz.siddharthseth.panettone
 import android.app.Fragment
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -13,7 +12,7 @@ import kotlinx.android.synthetic.main.fragment_image_share.*
 
 class ImageShare : Fragment(), View.OnClickListener {
 
-    private var croppedUri: Uri = Uri.EMPTY
+    var image: Image = Image()
 
     private var mListener: OnFragmentInteractionListener? = null
 
@@ -27,25 +26,22 @@ class ImageShare : Fragment(), View.OnClickListener {
         return inflater.inflate(R.layout.fragment_image_share, container, false)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        croppedUri = Uri.parse(arguments.getString("croppedUri"))
-    }
-
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         share.setOnClickListener {
             val shareIntent = Intent()
             shareIntent.action = Intent.ACTION_SEND
-            shareIntent.putExtra(Intent.EXTRA_STREAM, croppedUri)
+            shareIntent.putExtra(Intent.EXTRA_STREAM, image.uri)
             shareIntent.type = "image/*"
             shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
             startActivity(Intent.createChooser(shareIntent, "Share"))
         }
 
-        GlideApp.with(this).load(croppedUri).diskCacheStrategy(DiskCacheStrategy.NONE).into(
+        GlideApp.with(this).load(image.uri).diskCacheStrategy(DiskCacheStrategy.NONE).into(
                 img_save)
+
+        resultFileName.text = ""
     }
 
     override fun onAttach(context: Context) {
@@ -66,11 +62,11 @@ class ImageShare : Fragment(), View.OnClickListener {
     interface OnFragmentInteractionListener
 
     companion object {
-        fun newInstance(croppedUri: Uri): ImageShare {
+        fun newInstance(shareImage: Image): ImageShare {
             val fragment = ImageShare()
-            val args = Bundle()
-            args.putString("croppedUri", croppedUri.toString())
-            fragment.arguments = args
+
+            fragment.image = shareImage
+
             return fragment
         }
     }

@@ -3,41 +3,61 @@ package xyz.siddharthseth.panettone
 
 import android.app.Fragment
 import android.content.Context
+import android.net.Uri
 import android.os.Bundle
+import android.os.Environment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import com.wonderkiln.camerakit.*
+import com.yalantis.ucrop.UCrop
 import kotlinx.android.synthetic.main.fragment_camera.*
-
+import java.io.BufferedOutputStream
+import java.io.File
+import java.io.FileOutputStream
 
 class CameraFragment : Fragment(), CameraKitEventListener {
 
+    val TAG = "CameraFragment"
     private var flash = 0
     private var cameraFacing = 0
     private var mListener: OnFragmentInteractionListener? = null
 
     override fun onVideo(p0: CameraKitVideo?) {
-        Log.v("nero", "video event")
+        Log.v(TAG, "video event")
     }
 
     override fun onEvent(p0: CameraKitEvent?) {
-        Log.v("nero", "generic event")
+        Log.v(TAG, "generic event")
     }
 
     override fun onImage(p0: CameraKitImage?) {
-        Log.v("nero", "image event")
+        Log.v(TAG, "image event")
         if (p0 != null) {
             val byteArray = p0.jpeg
-            Log.v("nero", byteArray.size.toString())
+            Log.v(TAG, byteArray.size.toString())
+
+            val file = File(context.cacheDir, System.currentTimeMillis().toString() + ".jpg")
+            val file2 = File(
+                    Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
+                    "Panettone/")
+            file2.mkdirs()
+
+            val file3 = File(file2, System.currentTimeMillis().toString() + ".jpg")
+            val bufferedOutputStream = BufferedOutputStream(FileOutputStream(file))
+            bufferedOutputStream.write(byteArray)
+            bufferedOutputStream.flush()
+            bufferedOutputStream.close()
+            file.copyTo(file3, true, DEFAULT_BUFFER_SIZE)
+
+            UCrop.of(Uri.fromFile(file), Uri.fromFile(file3)).start(activity, 3)
         }
     }
 
     override fun onError(p0: CameraKitError?) {
-        Log.v("nero", "error event")
-        if (p0 != null)
-            Log.v("nero", p0.message)
+        Log.v(TAG, "error event")
+        if (p0 != null) Log.v(TAG, p0.message)
     }
 
 

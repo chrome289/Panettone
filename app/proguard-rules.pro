@@ -21,9 +21,9 @@
 #-renamesourcefileattribute SourceFile
 
 #ucrop
--dontwarn com.yalantis.ucrop**
--keep class com.yalantis.ucrop** { *; }
--keep interface com.yalantis.ucrop** { *; }
+-dontwarn xyz.siddharthseth.ucrop**
+-keep class xyz.siddharthseth.ucrop** { *; }
+-keep interface xyz.siddharthseth.ucrop** { *; }
 
 #glide
 -keep public class * implements com.bumptech.glide.module.GlideModule
@@ -32,3 +32,10 @@
   **[] $VALUES;
   public *;
 }
+
+#okhttp
+-dontwarn okhttp3.**
+-dontwarn okio.**
+-dontwarn javax.annotation.**
+# A resource is loaded with a relative path so the package of this class must be preserved.
+-keepnames class okhttp3.internal.publicsuffix.PublicSuffixDatabase
