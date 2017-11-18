@@ -8,9 +8,12 @@
     <io.fotoapparat.view.CameraView
         android:id="@+id/cameraView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+
+    </io.fotoapparat.view.CameraView>
 
     <RelativeLayout
+        android:id="@+id/relativeLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"

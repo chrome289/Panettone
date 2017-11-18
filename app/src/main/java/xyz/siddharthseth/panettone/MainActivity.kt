@@ -2,15 +2,13 @@ package xyz.siddharthseth.panettone
 
 import android.app.FragmentManager
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.yalantis.ucrop.UCrop
-
-
-
-
+import java.io.File
 
 class MainActivity : AppCompatActivity()
         , Dashboard.OnFragmentInteractionListener, CameraFragment.OnFragmentInteractionListener,
@@ -72,10 +70,27 @@ class MainActivity : AppCompatActivity()
                     Log.d(TAG, resultUri.path + " --- path")
                     val image = Image.newInstance(this, resultUri)
                     openImageShare(image)
+
+                    val cacheFile: File = File(cacheDir, image.fileName)
+                    cacheFile.delete()
                 }
             }
         } else {
             Log.e(TAG, "onActivityResult null for requestcode " + resultCode)
+        }
+        cacheDir.deleteRecursively()
+    }
+
+    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<out String>,
+            grantResults: IntArray) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            4 -> {
+                var bool = true
+                for (temp in grantResults) if (temp != PackageManager.PERMISSION_GRANTED) bool = false
+
+                if (bool) openCameraFragment()
+            }
         }
     }
 }

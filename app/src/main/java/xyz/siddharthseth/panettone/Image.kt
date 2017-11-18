@@ -92,6 +92,7 @@ class Image {
             if (finalFile.exists()) finalFile.delete()
 
             cacheFile.copyTo(finalFile, true, DEFAULT_BUFFER_SIZE)
+            cacheFile.delete()
 
             image.uri = getContentProviderUri(context, Uri.fromFile(finalFile))
             image.fileName = finalFile.name
