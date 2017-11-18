@@ -55,6 +55,8 @@ class CameraFragment : Fragment() {
         cameraFacingToggle.setOnClickListener {
             toggleCameraFacing(fotoapparatSwitcher, fotoApparatBack, fotoApparatFront)
         }
+
+        zoomView.CustomZoomView(context)
     }
 
     private fun setupCamera(lensPosition: LensPosition): Fotoapparat {
@@ -89,6 +91,8 @@ class CameraFragment : Fragment() {
 
             fotoApparatBack.let { fotoapparatSwitcher.switchTo(it) }
         }
+
+        zoomView.resetZoomFactor()
     }
 
     private fun takePicture(fotoapparatSwitcher: FotoapparatSwitcher) {
@@ -205,6 +209,10 @@ class CameraFragment : Fragment() {
             val args = Bundle()
             fragment.arguments = args
             return fragment
+        }
+
+        fun setZoomLevel(zoomLevel: Float) {
+            fotoapparatSwitcher.currentFotoapparat.setZoom(zoomLevel)
         }
     }
 }

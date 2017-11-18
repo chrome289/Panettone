@@ -12,6 +12,12 @@
 
     </io.fotoapparat.view.CameraView>
 
+    <xyz.siddharthseth.panettone.CustomZoomView
+        android:id="@+id/zoomView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/relativeLayout" />
+
     <RelativeLayout
         android:id="@+id/relativeLayout"
         android:layout_width="match_parent"
@@ -24,8 +30,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="30dp"
-            android:layout_toLeftOf="@+id/shutter"
+            android:layout_toStartOf="@+id/shutter"
             android:background="@drawable/camera_secondary_button"
+            android:contentDescription="@string/camera_shutter"
             android:paddingBottom="8dp"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
@@ -40,6 +47,7 @@
             android:layout_centerHorizontal="true"
             android:layout_margin="24dp"
             android:clickable="true"
+            android:focusable="true"
             android:scaleType="center"
             android:scaleX="1.25"
             android:scaleY="1.25"
@@ -51,8 +59,9 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_margin="30dp"
-            android:layout_toRightOf="@+id/shutter"
+            android:layout_toEndOf="@+id/shutter"
             android:background="@drawable/camera_secondary_button"
+            android:contentDescription="@string/camera_facing"
             android:paddingBottom="8dp"
             android:paddingLeft="16dp"
             android:paddingRight="16dp"
