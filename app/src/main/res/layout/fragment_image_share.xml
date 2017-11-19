@@ -19,28 +19,27 @@
         android:title="Panettone"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageView
+        android:id="@+id/img_save"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+
+        android:layout_below="@+id/toolbar"
+        android:layout_weight="1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
+
     <LinearLayout
         android:id="@+id/layout"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@+id/toolbar"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
         android:orientation="vertical"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.51"
         app:layout_constraintStart_toStartOf="parent">
-
-        <ImageView
-            android:id="@+id/img_save"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-
-            android:layout_weight="1"
-            android:elevation="2dp"
-            android:padding="12dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/toolbar" />
 
         <android.support.design.widget.FloatingActionButton
             android:id="@+id/share"
@@ -65,7 +64,7 @@
             android:layout_marginLeft="16dp"
             android:layout_marginRight="16dp"
             android:layout_weight="0"
-            android:background="#fff"
+            android:background="@color/colorPrimary"
             android:elevation="2dp"
             android:orientation="vertical">
 
@@ -73,101 +72,31 @@
                 android:id="@+id/resultFileName"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/colorPrimary"
+                android:layout_marginEnd="56dp"
+                android:layout_marginStart="0dp"
+                android:ellipsize="marquee"
+                android:maxLines="1"
                 android:paddingBottom="2dp"
-                android:paddingLeft="16dp"
-                android:paddingRight="16dp"
+                android:paddingEnd="8dp"
+                android:paddingStart="16dp"
                 android:paddingTop="8dp"
                 android:text="Sample Name.jpg"
-                android:textColor="#fff"
-                android:textSize="18sp" />
+                android:textColor="#eeeeee"
+                android:textSize="14sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/info"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/colorPrimary"
+                android:layout_weight="1"
                 android:paddingBottom="8dp"
-                android:paddingLeft="20dp"
-                android:paddingRight="12dp"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
                 android:paddingTop="2dp"
-                android:text="1280 X 720, JPG"
-                android:textColor="#e0e0e0"
-                android:textSize="12sp"
-                android:textStyle="bold" />
-
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:layout_gravity="center"
-                android:layout_marginBottom="12dp"
-                android:layout_marginTop="12dp"
-                android:orientation="horizontal">
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="4dp"
-                    android:layout_marginLeft="4dp"
-                    android:layout_marginRight="4dp"
-                    android:layout_weight="0"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/label1"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom|center_horizontal"
-                        android:layout_weight="0"
-                        android:padding="4dp"
-                        android:text="Final"
-                        android:textColor="#616161"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/finalSize"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom|center_horizontal"
-                        android:layout_weight="0"
-                        android:padding="4dp"
-                        android:text="115 KB"
-                        android:textColor="#2962ff"
-                        android:textSize="22sp" />
-                </LinearLayout>
-
-                <LinearLayout
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginBottom="12dp"
-                    android:layout_marginLeft="4dp"
-                    android:layout_marginRight="4dp"
-                    android:layout_weight="0"
-                    android:orientation="horizontal">
-
-                    <TextView
-                        android:id="@+id/label2"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom|center_horizontal"
-                        android:layout_weight="0"
-                        android:padding="4dp"
-                        android:text="Before"
-                        android:textColor="#616161"
-                        android:textStyle="bold" />
-
-                    <TextView
-                        android:id="@+id/beforeSize"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="bottom|center_horizontal"
-                        android:layout_weight="0"
-                        android:padding="4dp"
-                        android:text="957 KB"
-                        android:textColor="#ef6c00"
-                        android:textSize="22sp" />
-                </LinearLayout>
-            </LinearLayout>
+                android:text="617 KB, 1280 X 720, JPG"
+                android:textColor="#fff"
+                android:textSize="14sp" />
 
         </LinearLayout>
     </LinearLayout>

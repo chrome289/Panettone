@@ -8,7 +8,6 @@ import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import com.yalantis.ucrop.UCrop
-import java.io.File
 
 class MainActivity : AppCompatActivity()
         , Dashboard.OnFragmentInteractionListener, CameraFragment.OnFragmentInteractionListener,
@@ -55,8 +54,8 @@ class MainActivity : AppCompatActivity()
                     val resultUri: Uri? = UCrop.getOutput(data)
                     if (resultUri != null) {
                         Log.d(TAG, resultUri.path + " --- path")
-                        val image = Image.copyImageToStorage(this, resultUri)
-                        openImageShare(image)
+                        val uri: Uri = Image.copyImageToStorage(this, resultUri)
+                        openImageShare(Image.newInstance(this, uri))
                     }
                 } else if (resultCode == UCrop.RESULT_ERROR) {
                     val cropError = UCrop.getError(data)
@@ -68,15 +67,12 @@ class MainActivity : AppCompatActivity()
                 val resultUri: Uri? = UCrop.getOutput(data)
                 if (resultUri != null) {
                     Log.d(TAG, resultUri.path + " --- path")
-                    val image = Image.newInstance(this, resultUri)
-                    openImageShare(image)
-
-                    val cacheFile: File = File(cacheDir, image.fileName)
-                    cacheFile.delete()
+                    val uri: Uri = Image.copyImageToStorage(this, resultUri)
+                    openImageShare(Image.newInstance(this, uri))
                 }
             }
         } else {
-            Log.e(TAG, "onActivityResult null for requestcode " + resultCode)
+            Log.e(TAG, "onActivityResult null for requestcode " + requestCode)
         }
         cacheDir.deleteRecursively()
     }

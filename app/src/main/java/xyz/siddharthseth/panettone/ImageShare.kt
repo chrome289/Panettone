@@ -45,10 +45,12 @@ class ImageShare : Fragment(), View.OnClickListener {
             startActivity(Intent.createChooser(shareIntent, "Share"))
         }
 
-        GlideApp.with(this).load(image.uri).diskCacheStrategy(DiskCacheStrategy.NONE).into(
-                img_save)
+        GlideApp.with(this).load(image.uri).diskCacheStrategy(DiskCacheStrategy.NONE).into(img_save)
 
-        resultFileName.text = ""
+        resultFileName.text = image.fileName
+
+        val temp = image.getFileSize() + ", " + image.width + " x " + image.height + ", " + image.getExtension().toUpperCase()
+        info.text = temp
     }
 
     override fun onAttach(context: Context) {

@@ -6,7 +6,6 @@ import android.content.Context
 import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Bundle
-import android.os.Environment
 import android.support.v4.content.ContextCompat
 import android.util.Log
 import android.view.LayoutInflater
@@ -98,12 +97,8 @@ class CameraFragment : Fragment() {
     private fun takePicture(fotoapparatSwitcher: FotoapparatSwitcher) {
         val result = fotoapparatSwitcher.currentFotoapparat.takePicture()
 
-        val parentDir = File(
-                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
-                "Panettone/")
-        parentDir.mkdirs()
         val cacheFile = File(context.cacheDir, System.currentTimeMillis().toString() + ".bat")
-        val finalFile = File(parentDir, System.currentTimeMillis().toString() + ".jpg")
+        val finalFile = File(context.cacheDir, System.currentTimeMillis().toString() + ".jpg")
         finalFile.createNewFile()
 
         val pendingResult = result?.saveToFile(cacheFile)

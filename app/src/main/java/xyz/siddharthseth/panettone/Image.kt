@@ -1,24 +1,23 @@
 package xyz.siddharthseth.panettone
 
-import android.content.ContentValues
 import android.content.Context
 import android.database.Cursor
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Environment
-import android.provider.MediaStore
 import android.provider.OpenableColumns
 import android.util.Log
 import java.io.File
 
 class Image {
-    var fileName: String = ""
-    var fileSize: Long = 0
+    internal var fileName: String = ""
+    internal var fileSize: Long = 0
 
-    var height: Int = 0
-    var width: Int = 0
+    internal var height: Int = 0
+    internal var width: Int = 0
 
-    var uri: Uri = Uri.EMPTY
+    internal var uri: Uri = Uri.EMPTY
+    internal var fileUrl: Uri = Uri.EMPTY
 
     companion object {
 
@@ -31,25 +30,25 @@ class Image {
             image.uri = uri
 
             val cursor: Cursor? = context.contentResolver.query(uri, null, null, null, null)
-            if (cursor != null) {
+            if (cursor != null && cursor.moveToFirst()) {
                 val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
                 val sizeIndex = cursor.getColumnIndex(OpenableColumns.SIZE)
 
-                cursor.moveToFirst()
 
                 image.fileName = cursor.getString(nameIndex)
                 image.fileSize = cursor.getLong(sizeIndex)
 
                 cursor.close()
-
-                val options = BitmapFactory.Options()
-                options.inJustDecodeBounds = true
-                BitmapFactory.decodeStream(context.contentResolver.openInputStream(uri), null,
-                        options)
-
-                image.width = options.outWidth
-                image.height = options.outHeight
+            } else {
+                image.fileName = File(uri.path).name
+                image.fileSize = File(uri.path).length()
             }
+            val options = BitmapFactory.Options()
+            options.inJustDecodeBounds = true
+            BitmapFactory.decodeStream(context.contentResolver.openInputStream(uri), null, options)
+
+            image.width = options.outWidth
+            image.height = options.outHeight
 
             Log.d(TAG, "image object created named " + image.fileName)
             Log.d(TAG, "the url is " + image.uri)
@@ -70,6 +69,7 @@ class Image {
             finalFile.createNewFile()
 
             image.uri = Uri.fromFile(finalFile)
+            image.fileUrl = Uri.fromFile(finalFile)
             image.fileName = fileName
 
             Log.d(TAG, "image object created named " + image.fileName)
@@ -77,7 +77,7 @@ class Image {
             return image
         }
 
-        fun copyImageToStorage(context: Context, cacheUri: Uri): Image {
+        fun copyImageToStorage(context: Context, cacheUri: Uri): Uri {
             val image = Image()
 
             val parentDir = File(
@@ -89,33 +89,29 @@ class Image {
             val cacheFile = File(cacheUri.path)
 
             val finalFile = File(parentDir, cacheFile.name)
-            if (finalFile.exists()) finalFile.delete()
 
             cacheFile.copyTo(finalFile, true, DEFAULT_BUFFER_SIZE)
             cacheFile.delete()
 
-            image.uri = getContentProviderUri(context, Uri.fromFile(finalFile))
+            image.uri = Uri.fromFile(finalFile)
             image.fileName = finalFile.name
 
             Log.d(TAG, "image object created named " + image.fileName)
             Log.d(TAG, "the url is " + image.uri)
 
-            return image
+            return image.uri
         }
+    }
 
-        private fun getContentProviderUri(context: Context, resultUri: Uri): Uri {
-            val cursor = context.contentResolver.query(resultUri, null, null, null, null)
-            if (cursor != null && cursor.moveToFirst()) {
-                val id = cursor.getInt(cursor.getColumnIndex(MediaStore.MediaColumns._ID))
-                cursor.close()
-                return Uri.withAppendedPath(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, "" + id)
-            } else {
-                Log.d(TAG, "result uri in get contentprovider fun " + resultUri.toString())
-                val values = ContentValues()
-                values.put(MediaStore.Images.Media.DATA, resultUri.path)
-                return context.contentResolver.insert(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                        values)
-            }
-        }
+    fun getExtension(): String {
+        val temp = this.fileName.split(".")
+        return temp[temp.size - 1]
+    }
+
+    fun getFileSize(): String {
+        if (this.fileSize < 1024) return (this.fileSize).toString() + " B"
+        else if (this.fileSize < (1024 * 1024)) return (this.fileSize / 1024).toString() + " KB"
+        else return (this.fileSize / (1024 * 1024)).toString() + "." + String.format("%.0f",
+                (this.fileSize % (1024 * 1024)) / (1024 * 10.24f)) + " MB"
     }
 }
