@@ -24,7 +24,7 @@ import java.io.File
 
 class CameraFragment : Fragment() {
 
-    val TAG = "CameraFragment"
+    private val TAG = "CameraFragment"
     private var flash = 0
     private var cameraFacing = 0
     private var mListener: OnFragmentInteractionListener? = null
@@ -59,7 +59,7 @@ class CameraFragment : Fragment() {
     }
 
     private fun setupCamera(lensPosition: LensPosition): Fotoapparat {
-        val fotoApparat = Fotoapparat.with(context).into(cameraView).sensorSensitivity(
+        return Fotoapparat.with(context).into(cameraView).sensorSensitivity(
                 SensorSensitivitySelectors.highestSensorSensitivity()).previewScaleType(
                 ScaleType.CENTER_CROP).photoSize(SizeSelectors.biggestSize()).lensPosition(
                 LensPositionSelectors.lensPosition(lensPosition)).focusMode(
@@ -67,12 +67,10 @@ class CameraFragment : Fragment() {
                         FocusModeSelectors.autoFocus(), FocusModeSelectors.fixed())).flash(
                 Selectors.firstAvailable(FlashSelectors.autoFlash(), FlashSelectors.off(),
                         FlashSelectors.on())).logger(Loggers.logcat()).build()
-        return fotoApparat
     }
 
     private fun setupCameraSwitcher(fotoApparatBack: Fotoapparat): FotoapparatSwitcher {
-        val fotoapparatSwitcher = FotoapparatSwitcher.withDefault(fotoApparatBack)
-        return fotoapparatSwitcher
+        return FotoapparatSwitcher.withDefault(fotoApparatBack)
     }
 
     private fun toggleCameraFacing(fotoapparatSwitcher: FotoapparatSwitcher,
@@ -98,14 +96,14 @@ class CameraFragment : Fragment() {
         val result = fotoapparatSwitcher.currentFotoapparat.takePicture()
 
         val cacheFile = File(context.cacheDir, System.currentTimeMillis().toString() + ".bat")
-        val finalFile = File(context.cacheDir, System.currentTimeMillis().toString() + ".jpg")
-        finalFile.createNewFile()
+        cacheFile.createNewFile()
 
         val pendingResult = result?.saveToFile(cacheFile)
         pendingResult?.whenAvailable {
             Log.d(TAG, "image saved in cache " + cacheFile.name)
+
             val inputImage = Image.newInstance(context, Uri.fromFile(cacheFile))
-            val outputImage = Image.newInstance(context, Uri.fromFile(finalFile))
+            val outputImage = Image.newInstance(context, inputImage.getFileNameWoExt())
 
             openUCrop(inputImage, outputImage)
         }

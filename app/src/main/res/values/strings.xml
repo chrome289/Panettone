@@ -2,7 +2,6 @@
     <string name="app_name">Panettone</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="camera_facing">camera facing</string>
     <string name="camera_shutter">camera shutter</string>
 </resources>

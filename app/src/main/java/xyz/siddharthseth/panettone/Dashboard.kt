@@ -62,10 +62,10 @@ class Dashboard : Fragment() {
         if (permission2 != PackageManager.PERMISSION_GRANTED) array.add(
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
-        if (array.size == 0) return true
+        return if (array.size == 0) true
         else {
             askForPermission(array.toTypedArray())
-            return false
+            false
         }
     }
 

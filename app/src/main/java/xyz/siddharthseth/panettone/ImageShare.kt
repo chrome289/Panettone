@@ -6,20 +6,35 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toolbar
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import kotlinx.android.synthetic.main.fragment_image_share.*
 
-class ImageShare : Fragment(), View.OnClickListener {
+class ImageShare : Fragment(), View.OnClickListener, Toolbar.OnMenuItemClickListener {
+    override fun onMenuItemClick(p0: MenuItem?): Boolean {
+        Log.v(TAG, "tag")
+        return false
+    }
+
+    override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
+        if (menuItem.itemId == android.R.id.home) {
+            Log.v(TAG, "tag")
+        }
+        Log.v(TAG, "tag")
+        return super.onOptionsItemSelected(menuItem)
+    }
 
     var image: Image = Image()
 
     private var mListener: OnFragmentInteractionListener? = null
 
-    val TAG = "ImageShare"
+    private val TAG = "ImageShare"
 
     override fun onClick(p0: View?) {
+        Log.v(TAG, "tag")
         fragmentManager.popBackStack()
     }
 
@@ -36,6 +51,17 @@ class ImageShare : Fragment(), View.OnClickListener {
 
         Log.d(TAG, "onViewCreated")
 
+        toolbar.title = "Image Converted"
+
+        activity.setActionBar(toolbar)
+        activity.actionBar.setDisplayShowHomeEnabled(true)
+        activity.actionBar.setDisplayHomeAsUpEnabled(true)
+
+        toolbar.setNavigationOnClickListener {
+            fragmentManager.popBackStack()
+        }
+
+
         share.setOnClickListener {
             val shareIntent = Intent()
             shareIntent.action = Intent.ACTION_SEND
@@ -49,7 +75,7 @@ class ImageShare : Fragment(), View.OnClickListener {
 
         resultFileName.text = image.fileName
 
-        val temp = image.getFileSize() + ", " + image.width + " x " + image.height + ", " + image.getExtension().toUpperCase()
+        val temp = image.getFileSize() + ", " + image.width + " x " + image.height + ", " + image.fileExtension.toUpperCase()
         info.text = temp
     }
 

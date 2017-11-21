@@ -8,7 +8,7 @@ import android.view.ScaleGestureDetector
 import android.widget.RelativeLayout
 
 class CustomZoomView(context: Context?, attrs: AttributeSet?) : RelativeLayout(context, attrs) {
-    var scaleDetector: ScaleGestureDetector? = null
+    private var scaleDetector: ScaleGestureDetector? = null
     var zoomFactor = 0.0f
     val TAG = "CustomZoomView"
 

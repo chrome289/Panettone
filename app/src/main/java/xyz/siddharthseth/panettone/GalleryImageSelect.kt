@@ -14,7 +14,7 @@ import com.yalantis.ucrop.UCrop
 
 class GalleryImageSelect : Fragment() {
 
-    val TAG = "GalleryImageSelect"
+    private val TAG = "GalleryImageSelect"
 
     private var mListener: OnFragmentInteractionListener? = null
 
@@ -46,7 +46,7 @@ class GalleryImageSelect : Fragment() {
         if (requestCode == 1) {
 
             val inputImage = Image.newInstance(context, Uri.parse(data.data.toString()))
-            val outputImage = Image.newInstance(context, inputImage.fileName)
+            val outputImage = Image.newInstance(context, inputImage.getFileNameWoExt())
 
             openUCrop(inputImage, outputImage)
         }

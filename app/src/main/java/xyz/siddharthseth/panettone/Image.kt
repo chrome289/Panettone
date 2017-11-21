@@ -12,6 +12,7 @@ import java.io.File
 class Image {
     internal var fileName: String = ""
     internal var fileSize: Long = 0
+    internal var fileExtension: String = ""
 
     internal var height: Int = 0
     internal var width: Int = 0
@@ -21,7 +22,7 @@ class Image {
 
     companion object {
 
-        val TAG = "ImageClass"
+        private val TAG = "ImageClass"
 
         //for mediastore files
         fun newInstance(context: Context, uri: Uri): Image {
@@ -37,11 +38,13 @@ class Image {
 
                 image.fileName = cursor.getString(nameIndex)
                 image.fileSize = cursor.getLong(sizeIndex)
+                image.fileExtension = cursor.getString(nameIndex).split(".")[0]
 
                 cursor.close()
             } else {
                 image.fileName = File(uri.path).name
                 image.fileSize = File(uri.path).length()
+                image.fileExtension = File(uri.path).extension
             }
             val options = BitmapFactory.Options()
             options.inJustDecodeBounds = true
@@ -77,7 +80,7 @@ class Image {
             return image
         }
 
-        fun copyImageToStorage(context: Context, cacheUri: Uri): Uri {
+        fun copyImageToStorage(cacheUri: Uri, compressFormat: String): Uri {
             val image = Image()
 
             val parentDir = File(
@@ -88,7 +91,8 @@ class Image {
 
             val cacheFile = File(cacheUri.path)
 
-            val finalFile = File(parentDir, cacheFile.name)
+            val finalFile = File(parentDir, cacheFile.name + "." + compressFormat)
+            finalFile.createNewFile()
 
             cacheFile.copyTo(finalFile, true, DEFAULT_BUFFER_SIZE)
             cacheFile.delete()
@@ -103,15 +107,23 @@ class Image {
         }
     }
 
-    fun getExtension(): String {
-        val temp = this.fileName.split(".")
-        return temp[temp.size - 1]
+    fun getFileSize(): String {
+        when {
+            this.fileSize < 1024 -> return (this.fileSize).toString() + " B"
+            this.fileSize < (1024 * 1024) -> return (this.fileSize / 1024).toString() + " KB"
+            else -> return (this.fileSize / (1024 * 1024)).toString() + "." + String.format("%.0f",
+                    (this.fileSize % (1024 * 1024)) / (1024 * 10.24f)) + " MB"
+        }
     }
 
-    fun getFileSize(): String {
-        if (this.fileSize < 1024) return (this.fileSize).toString() + " B"
-        else if (this.fileSize < (1024 * 1024)) return (this.fileSize / 1024).toString() + " KB"
-        else return (this.fileSize / (1024 * 1024)).toString() + "." + String.format("%.0f",
-                (this.fileSize % (1024 * 1024)) / (1024 * 10.24f)) + " MB"
+    fun getFileNameWoExt(): String {
+        //Log.v(TAG,"##  "+this.fileName)
+        val array = this.fileName.split(".")
+        var str = ""
+        for (x in array.indices) {
+            if (x < (array.size - 1)) str += array[x]
+        }
+        //Log.v(TAG,"@@  "+str)
+        return str
     }
 }

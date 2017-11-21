@@ -14,7 +14,7 @@ class MainActivity : AppCompatActivity()
         GalleryImageSelect.OnFragmentInteractionListener,
         ImageShare.OnFragmentInteractionListener {
 
-    val TAG = "MainActivity"
+    private val TAG = "MainActivity"
     override fun openImageShare(shareImage: Image) {
         Log.v(TAG, "open image share")
         fragmentManager.beginTransaction().add(R.id.frame,
@@ -49,26 +49,22 @@ class MainActivity : AppCompatActivity()
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (data != null) {
-            if (requestCode == 2) {
+            if (requestCode == 2 || requestCode == 3) {
                 if (resultCode != UCrop.RESULT_ERROR && requestCode != UCrop.RESULT_ERROR) {
-                    val resultUri: Uri? = UCrop.getOutput(data)
-                    if (resultUri != null) {
-                        Log.d(TAG, resultUri.path + " --- path")
-                        val uri: Uri = Image.copyImageToStorage(this, resultUri)
-                        openImageShare(Image.newInstance(this, uri))
+                    val resultUri: Uri = UCrop.getOutput(data)!!
+                    val compressFormat = when (data.extras.getInt(UCrop.EXTRA_OUTPUT_FORMAT)) {
+                        0 -> "jpg"
+                        1 -> "png"
+                        2 -> "webp"
+                        else -> "jpg"
                     }
+                    val uri: Uri = Image.copyImageToStorage(resultUri, compressFormat)
+                    openImageShare(Image.newInstance(this, uri))
                 } else if (resultCode == UCrop.RESULT_ERROR) {
                     val cropError = UCrop.getError(data)
-                    Log.v(TAG, "error for cropping " + cropError)
+                    cropError?.printStackTrace()
                 } else {
                     fragmentManager.popBackStack()
-                }
-            } else if (requestCode == 3) {
-                val resultUri: Uri? = UCrop.getOutput(data)
-                if (resultUri != null) {
-                    Log.d(TAG, resultUri.path + " --- path")
-                    val uri: Uri = Image.copyImageToStorage(this, resultUri)
-                    openImageShare(Image.newInstance(this, uri))
                 }
             }
         } else {
@@ -82,8 +78,7 @@ class MainActivity : AppCompatActivity()
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             4 -> {
-                var bool = true
-                for (temp in grantResults) if (temp != PackageManager.PERMISSION_GRANTED) bool = false
+                val bool = grantResults.none { it != PackageManager.PERMISSION_GRANTED }
 
                 if (bool) openCameraFragment()
             }
