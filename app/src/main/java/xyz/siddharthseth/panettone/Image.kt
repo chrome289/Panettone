@@ -26,10 +26,12 @@ class Image {
 
         //for mediastore files
         fun newInstance(context: Context, uri: Uri): Image {
+            Log.d(TAG, "newInstance")
             val image = Image()
 
             image.uri = uri
 
+            //get file info from mediastore
             val cursor: Cursor? = context.contentResolver.query(uri, null, null, null, null)
             if (cursor != null && cursor.moveToFirst()) {
                 val nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
@@ -42,12 +44,14 @@ class Image {
 
                 cursor.close()
             } else {
+                //get file info directly (use if link is not a mediastore one)
                 image.fileName = File(uri.path).name
                 image.fileSize = File(uri.path).length()
                 image.fileExtension = File(uri.path).extension
             }
+            //use bitmap factory for getting image bounds
             val options = BitmapFactory.Options()
-            options.inJustDecodeBounds = true
+            options.inJustDecodeBounds = true //don't load bitmap in memory
             BitmapFactory.decodeStream(context.contentResolver.openInputStream(uri), null, options)
 
             image.width = options.outWidth
@@ -61,12 +65,14 @@ class Image {
 
         //for cache files
         fun newInstance(context: Context, fileName: String): Image {
+            Log.d(TAG, "newInstance2")
             val image = Image()
 
+            //cache dir
             val parentDir = context.cacheDir
-
             parentDir.mkdirs()
 
+            //cache file created with the parameter name
             val finalFile = File(parentDir, fileName)
             if (finalFile.exists()) finalFile.delete()
             finalFile.createNewFile()
@@ -81,8 +87,10 @@ class Image {
         }
 
         fun copyImageToStorage(cacheUri: Uri, compressFormat: String): Uri {
+            Log.d(TAG, "copyImageToStorage")
             val image = Image()
 
+            //copy cache file to storage
             val parentDir = File(
                     Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_PICTURES),
                     "Panettone/")
@@ -108,22 +116,23 @@ class Image {
     }
 
     fun getFileSize(): String {
-        when {
-            this.fileSize < 1024 -> return (this.fileSize).toString() + " B"
-            this.fileSize < (1024 * 1024) -> return (this.fileSize / 1024).toString() + " KB"
-            else -> return (this.fileSize / (1024 * 1024)).toString() + "." + String.format("%.0f",
+        Log.d(TAG, "getFileSize")
+        //return formatted file size (bytes)
+        return when {
+            this.fileSize < 1024 -> (this.fileSize).toString() + " B"
+            this.fileSize < (1024 * 1024) -> (this.fileSize / 1024).toString() + " KB"
+            else -> (this.fileSize / (1024 * 1024)).toString() + "." + String.format("%.0f",
                     (this.fileSize % (1024 * 1024)) / (1024 * 10.24f)) + " MB"
         }
     }
 
     fun getFileNameWoExt(): String {
-        //Log.v(TAG,"##  "+this.fileName)
+        Log.d(TAG, "getFileNameWoExt")
+        //file name w/o ext. used to get cache file name
         val array = this.fileName.split(".")
         var str = ""
-        for (x in array.indices) {
-            if (x < (array.size - 1)) str += array[x]
-        }
-        //Log.v(TAG,"@@  "+str)
+        array.indices.asSequence().filter { it < (array.size - 1) }.forEach { str += array[it] }
+        //Log.d(TAG,"@@  "+str)
         return str
     }
 }

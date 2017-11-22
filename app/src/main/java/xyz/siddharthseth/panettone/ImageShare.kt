@@ -6,37 +6,15 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
-import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toolbar
 import com.bumptech.glide.load.engine.DiskCacheStrategy
 import kotlinx.android.synthetic.main.fragment_image_share.*
 
-class ImageShare : Fragment(), View.OnClickListener, Toolbar.OnMenuItemClickListener {
-    override fun onMenuItemClick(p0: MenuItem?): Boolean {
-        Log.v(TAG, "tag")
-        return false
-    }
-
-    override fun onOptionsItemSelected(menuItem: MenuItem): Boolean {
-        if (menuItem.itemId == android.R.id.home) {
-            Log.v(TAG, "tag")
-        }
-        Log.v(TAG, "tag")
-        return super.onOptionsItemSelected(menuItem)
-    }
-
+class ImageShare : Fragment() {
     var image: Image = Image()
 
     private var mListener: OnFragmentInteractionListener? = null
-
-    private val TAG = "ImageShare"
-
-    override fun onClick(p0: View?) {
-        Log.v(TAG, "tag")
-        fragmentManager.popBackStack()
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
             savedInstanceState: Bundle?): View? {
@@ -51,6 +29,7 @@ class ImageShare : Fragment(), View.OnClickListener, Toolbar.OnMenuItemClickList
 
         Log.d(TAG, "onViewCreated")
 
+        //toolbar customization
         toolbar.title = "Image Converted"
 
         activity.setActionBar(toolbar)
@@ -61,7 +40,7 @@ class ImageShare : Fragment(), View.OnClickListener, Toolbar.OnMenuItemClickList
             fragmentManager.popBackStack()
         }
 
-
+        //intent for sharing final image
         share.setOnClickListener {
             val shareIntent = Intent()
             shareIntent.action = Intent.ACTION_SEND
@@ -71,10 +50,12 @@ class ImageShare : Fragment(), View.OnClickListener, Toolbar.OnMenuItemClickList
             startActivity(Intent.createChooser(shareIntent, "Share"))
         }
 
+        //using glide to load image in ui
         GlideApp.with(this).load(image.uri).diskCacheStrategy(DiskCacheStrategy.NONE).into(img_save)
 
         resultFileName.text = image.fileName
 
+        //file info
         val temp = image.getFileSize() + ", " + image.width + " x " + image.height + ", " + image.fileExtension.toUpperCase()
         info.text = temp
     }
@@ -101,9 +82,9 @@ class ImageShare : Fragment(), View.OnClickListener, Toolbar.OnMenuItemClickList
     interface OnFragmentInteractionListener
 
     companion object {
+        val TAG = "ImageShare"
         fun newInstance(shareImage: Image): ImageShare {
             val fragment = ImageShare()
-
             fragment.image = shareImage
 
             return fragment

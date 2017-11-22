@@ -7,6 +7,7 @@ import android.content.pm.PackageManager
 import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,6 +19,7 @@ class Dashboard : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+        Log.d(TAG, "onCreatedView")
         return inflater.inflate(R.layout.fragment_dashboard, container, false)
     }
 
@@ -25,7 +27,11 @@ class Dashboard : Fragment() {
     override fun onViewCreated(view: View?, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        Log.d(TAG, "onViewCreated")
         fragmentManager.popBackStack()
+
+        //check permissions at app start
+        checkForPermissions()
 
         gallerySelector.setOnClickListener {
             mListener?.openImageResize()
@@ -39,6 +45,7 @@ class Dashboard : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
+        Log.d(TAG, "onAttach")
         mListener = if (context is OnFragmentInteractionListener) {
             context
         } else {
@@ -48,12 +55,16 @@ class Dashboard : Fragment() {
 
     override fun onDetach() {
         super.onDetach()
+        Log.d(TAG, "onDetach")
         mListener = null
     }
 
     private fun checkForPermissions(): Boolean {
-        val permission1 = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
-        val permission2 = ContextCompat.checkSelfPermission(context,
+        Log.d(TAG, "checkForPermission")
+
+        //permissions
+        val permission1 = ContextCompat.checkSelfPermission(activity, Manifest.permission.CAMERA)
+        val permission2 = ContextCompat.checkSelfPermission(activity,
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
         val array = ArrayList<String>()
@@ -62,6 +73,7 @@ class Dashboard : Fragment() {
         if (permission2 != PackageManager.PERMISSION_GRANTED) array.add(
                 Manifest.permission.WRITE_EXTERNAL_STORAGE)
 
+        //if any permission not available, ask them
         return if (array.size == 0) true
         else {
             askForPermission(array.toTypedArray())
@@ -70,6 +82,7 @@ class Dashboard : Fragment() {
     }
 
     private fun askForPermission(permissions: Array<String>) {
+        Log.d(TAG, "askForPermission")
         ActivityCompat.requestPermissions(activity, permissions, 4)
     }
 
@@ -80,7 +93,10 @@ class Dashboard : Fragment() {
     }
 
     companion object {
+        val TAG = "Dashboard"
+
         fun newInstance(): Dashboard {
+            Log.d(TAG, "newInstance")
             val fragment = Dashboard()
             val args = Bundle()
             fragment.arguments = args

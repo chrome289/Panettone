@@ -15,49 +15,56 @@ class MainActivity : AppCompatActivity()
         ImageShare.OnFragmentInteractionListener {
 
     private val TAG = "MainActivity"
+    //functions for opening various frags
     override fun openImageShare(shareImage: Image) {
-        Log.v(TAG, "open image share")
-        fragmentManager.beginTransaction().add(R.id.frame,
-                ImageShare.newInstance(shareImage)).addToBackStack("imageSave").commit()
+        Log.d(TAG, "openImageShare")
+        fragmentManager.beginTransaction().add(R.id.frame, ImageShare.newInstance(shareImage)).addToBackStack("imageSave").commit()
     }
 
     override fun openImageResize() {
-        Log.v(TAG, "open image resize")
+        Log.d(TAG, "openImageResize")
         fragmentManager.beginTransaction().add(R.id.frame,
                 GalleryImageSelect.newInstance()).addToBackStack("imageResizer").commit()
     }
 
     override fun openCameraFragment() {
-        Log.v(TAG, "open camera fragment")
+        Log.d(TAG, "openCameraFragment")
         fragmentManager.beginTransaction().add(R.id.frame,
                 CameraFragment.newInstance()).addToBackStack("camera").commit()
     }
 
     private fun openDashboard() {
-        Log.v(TAG, "open dashboard")
+        Log.d(TAG, "openDashboard")
         val fragmentManager: FragmentManager = fragmentManager
         fragmentManager.beginTransaction().replace(R.id.frame, Dashboard.newInstance()).commit()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.v(TAG, "on create")
+        Log.d(TAG, "onCreate")
         setContentView(R.layout.activity_main)
         openDashboard()
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        //intent results for ucrop results
+        //2 is for gallery, 3 for camera
         super.onActivityResult(requestCode, resultCode, data)
         if (data != null) {
             if (requestCode == 2 || requestCode == 3) {
                 if (resultCode != UCrop.RESULT_ERROR && requestCode != UCrop.RESULT_ERROR) {
                     val resultUri: Uri = UCrop.getOutput(data)!!
+                    Log.d(TAG, resultUri.path)
+
+                    //get compress format from ucrop extras
+                    //set ext based on compression
                     val compressFormat = when (data.extras.getInt(UCrop.EXTRA_OUTPUT_FORMAT)) {
                         0 -> "jpg"
                         1 -> "png"
                         2 -> "webp"
                         else -> "jpg"
                     }
+                    //copy cache file to storage and display
                     val uri: Uri = Image.copyImageToStorage(resultUri, compressFormat)
                     openImageShare(Image.newInstance(this, uri))
                 } else if (resultCode == UCrop.RESULT_ERROR) {
@@ -70,6 +77,7 @@ class MainActivity : AppCompatActivity()
         } else {
             Log.e(TAG, "onActivityResult null for requestcode " + requestCode)
         }
+        //delete cache completely
         cacheDir.deleteRecursively()
     }
 
@@ -78,6 +86,7 @@ class MainActivity : AppCompatActivity()
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         when (requestCode) {
             4 -> {
+                //if any permission is not granted don't open the camera
                 val bool = grantResults.none { it != PackageManager.PERMISSION_GRANTED }
 
                 if (bool) openCameraFragment()

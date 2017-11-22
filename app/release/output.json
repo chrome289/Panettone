@@ -12,7 +12,7 @@
     "properties": {
       "packageId": "xyz.siddharthseth.panettone",
       "split": "",
-      "minSdkVersion": "23"
+      "minSdkVersion": "19"
     }
   }
 ]

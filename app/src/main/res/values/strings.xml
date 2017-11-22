@@ -4,4 +4,8 @@
     <!-- TODO: Remove or change this placeholder text -->
     <string name="camera_facing">camera facing</string>
     <string name="camera_shutter">camera shutter</string>
+    <string name="save_image">save image</string>
+    <string name="app_desc">Save space by compressing and resizing an Image</string>
+    <string name="take_a_photo">Take a Photo</string>
+    <string name="open_from_gallery">Open from Gallery</string>
 </resources>
