@@ -29,60 +29,60 @@ import static org.hamcrest.Matchers.is;
 @RunWith(AndroidJUnit4.class)
 public class MainActivityTest {
 
-	@Rule
-	public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
+    @Rule
+    public ActivityTestRule<MainActivity> mActivityTestRule = new ActivityTestRule<>(MainActivity.class);
 
-	private static Matcher<View> childAtPosition(
-					final Matcher<View> parentMatcher, final int position) {
+    private static Matcher<View> childAtPosition(
+            final Matcher<View> parentMatcher, final int position) {
 
-		return new TypeSafeMatcher<View>() {
-			@Override
-			public void describeTo(Description description) {
-				description.appendText("Child at position " + position + " in parent ");
-				parentMatcher.describeTo(description);
-			}
+        return new TypeSafeMatcher<View>() {
+            @Override
+            public void describeTo(Description description) {
+                description.appendText("Child at position " + position + " in parent ");
+                parentMatcher.describeTo(description);
+            }
 
-			@Override
-			public boolean matchesSafely(View view) {
-				ViewParent parent = view.getParent();
-				return parent instanceof ViewGroup && parentMatcher.matches(parent)
-								&& view.equals(((ViewGroup) parent).getChildAt(position));
-			}
-		};
-	}
+            @Override
+            public boolean matchesSafely(View view) {
+                ViewParent parent = view.getParent();
+                return parent instanceof ViewGroup && parentMatcher.matches(parent)
+                        && view.equals(((ViewGroup) parent).getChildAt(position));
+            }
+        };
+    }
 
-	@Test
-	public void mainActivityTest() {
-		ViewInteraction floatingActionButton = onView(
-						allOf(withId(R.id.shutter),
-										childAtPosition(
-														allOf(withId(R.id.relativeLayout),
-																		childAtPosition(
-																						withClassName(is("android.widget.RelativeLayout")),
-																						2)),
-														1),
-										isDisplayed()));
-		floatingActionButton.perform(click());
+    @Test
+    public void mainActivityTest() {
+        ViewInteraction floatingActionButton = onView(
+                allOf(withId(R.id.shutter),
+                        childAtPosition(
+                                allOf(withId(R.id.relativeLayout),
+                                        childAtPosition(
+                                                withClassName(is("android.widget.RelativeLayout")),
+                                                2)),
+                                1),
+                        isDisplayed()));
+        floatingActionButton.perform(click());
 
-		ViewInteraction actionMenuItemView = onView(
-						allOf(withId(R.id.menu_crop), withContentDescription("Crop"),
-										childAtPosition(
-														childAtPosition(
-																		withId(R.id.toolbar),
-																		2),
-														0),
-										isDisplayed()));
-		actionMenuItemView.perform(click());
+        ViewInteraction actionMenuItemView = onView(
+                allOf(withId(R.id.menu_crop), withContentDescription("Crop"),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.toolbar),
+                                        2),
+                                0),
+                        isDisplayed()));
+        actionMenuItemView.perform(click());
 
-		ViewInteraction floatingActionButton2 = onView(
-						allOf(withId(R.id.share),
-										childAtPosition(
-														childAtPosition(
-																		withId(R.id.frame),
-																		2),
-														2),
-										isDisplayed()));
-		floatingActionButton2.perform(click());
+        ViewInteraction floatingActionButton2 = onView(
+                allOf(withId(R.id.share),
+                        childAtPosition(
+                                childAtPosition(
+                                        withId(R.id.frame),
+                                        2),
+                                2),
+                        isDisplayed()));
+        floatingActionButton2.perform(click());
 
-	}
+    }
 }

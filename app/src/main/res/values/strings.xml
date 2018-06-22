@@ -2,10 +2,18 @@
     <string name="app_name">Panettone</string>
 
     <!-- TODO: Remove or change this placeholder text -->
-    <string name="camera_facing">camera facing</string>
-    <string name="camera_shutter">camera shutter</string>
-    <string name="save_image">save image</string>
-    <string name="app_desc">Save space by compressing and resizing an Image</string>
     <string name="take_a_photo">Take a Photo</string>
     <string name="open_from_gallery">Open from Gallery</string>
+    <string name="link"><a href="https://www.siddharthseth.xyz">Made by Siddharth Seth</a></string>
+    <string name="file_provider">xyz.siddharthseth.panettone.fileprovider</string>
+    <string name="result">Result</string>
+    <string name="info">Info</string>
+    <string name="why_are_you_doing">Why are you doing?</string>
+    <string name="open_image">Open Image</string>
+    <string name="share">Share</string>
+    <string name="file_converted">File Converted</string>
+    <string name="sample_size">2.65 MB</string>
+    <string name="sample_text">TextView</string>
+    <string name="sample_res">1920 x 1080</string>
+    <string name="sample_format">JPG</string>
 </resources>
